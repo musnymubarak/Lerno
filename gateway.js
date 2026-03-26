@@ -34,6 +34,12 @@ app.use(['/api/v1/tutors', '/api/v1/subjects'], createProxyMiddleware({
   changeOrigin: true,
 }));
 
+// Booking Service -> 3004
+app.use('/api/v1/bookings', createProxyMiddleware({
+  target: 'http://localhost:3004',
+  changeOrigin: true,
+}));
+
 app.listen(PORT, () => {
   console.log(`🚀 Gateway proxy running at http://localhost:${PORT}`);
 });
