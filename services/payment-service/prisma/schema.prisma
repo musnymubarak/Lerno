@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PaymentStatus {
+  INITIATED
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum OutboxStatus {
+  PENDING
+  PUBLISHED
+  FAILED
+}
+
+model Payment {
+  id             String        @id @default(uuid()) @db.Uuid
+  bookingId      String        @unique @db.Uuid
+  payerId        String        @db.Uuid
+  amount         Decimal       @db.Decimal(10, 2)
+  currency       String        @default("LKR") @db.Char(3)
+  payhereOrderId String        @unique @db.VarChar
+  payhereRef     String?       @db.VarChar
+  method         String?       @db.VarChar
+  status         PaymentStatus @default(INITIATED)
+  notifyPayload  Json?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+model Outbox {
+  id          String       @id @default(uuid()) @db.Uuid
+  eventType   String
+  payload     Json
+  status      OutboxStatus @default(PENDING)
+  retryCount  Int          @default(0)
+  publishedAt DateTime?
+  createdAt   DateTime     @default(now())
+}

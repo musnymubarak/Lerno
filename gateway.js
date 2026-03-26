@@ -40,6 +40,30 @@ app.use('/api/v1/bookings', createProxyMiddleware({
   changeOrigin: true,
 }));
 
+// Payment Service -> 3005
+app.use('/api/v1/payments', createProxyMiddleware({
+  target: 'http://localhost:3005',
+  changeOrigin: true,
+}));
+
+// Notification Service -> 3006
+app.use('/api/v1/notifications', createProxyMiddleware({
+  target: 'http://localhost:3006',
+  changeOrigin: true,
+}));
+
+// Review Service -> 3007
+app.use('/api/v1/reviews', createProxyMiddleware({
+  target: 'http://localhost:3007',
+  changeOrigin: true,
+}));
+
+// Message Service -> 3008
+app.use('/api/v1/messages', createProxyMiddleware({
+  target: 'http://localhost:3008',
+  changeOrigin: true,
+}));
+
 app.listen(PORT, () => {
   console.log(`🚀 Gateway proxy running at http://localhost:${PORT}`);
 });
