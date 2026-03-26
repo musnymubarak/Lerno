@@ -1,8 +1,15 @@
 const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
+const cors = require('cors');
 
 const app = express();
 const PORT = 3000;
+
+// Enable CORS for frontend
+app.use(cors({
+  origin: 'http://localhost:3001',
+  credentials: true,
+}));
 
 // Block internal routes from external access
 app.use((req, res, next) => {
@@ -15,9 +22,9 @@ app.use((req, res, next) => {
   next();
 });
 
-// Auth Service -> 3001
+// Auth Service -> 3011 (Moved from 3001 to avoid conflict with frontend)
 app.use('/api/v1/auth', createProxyMiddleware({
-  target: 'http://localhost:3001',
+  target: 'http://localhost:3011',
   changeOrigin: true,
 }));
 
