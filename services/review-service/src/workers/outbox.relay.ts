@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://guest:guest@localhost:5672';
+const RABBITMQ_URL = process.env.RABBITMQ_URL!;
 const EXCHANGE_NAME = 'review.events';
 const INTERVAL_MS = 5000;
 
@@ -12,12 +12,14 @@ let channel: amqp.Channel;
 
 const connectRabbitMQ = async () => {
   try {
+    const host = RABBITMQ_URL.split('@')[1] ?? RABBITMQ_URL;
+    console.log(`🔌 [review-service] Connecting to RabbitMQ at: ${host}`);
     const connection = await amqp.connect(RABBITMQ_URL);
     channel = await connection.createChannel();
     await channel.assertExchange(EXCHANGE_NAME, 'topic', { durable: true });
-    console.log('✅ Connected to RabbitMQ (Review Service)');
+    console.log('✅ [review-service] Connected to RabbitMQ');
   } catch (error) {
-    console.error('❌ RabbitMQ connection failed', error);
+    console.error('❌ [review-service] RabbitMQ connection failed', error);
   }
 };
 

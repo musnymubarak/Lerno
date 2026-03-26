@@ -4,12 +4,14 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://guest:guest@localhost:5672';
+const RABBITMQ_URL = process.env.RABBITMQ_URL!;
 const EXCHANGES = ['user.events', 'booking.events', 'payment.events'];
 const QUEUE_NAME = 'notification_service_queue';
 
 export const startEventSubscriber = async () => {
   try {
+    const host = RABBITMQ_URL.split('@')[1] ?? RABBITMQ_URL;
+    console.log(`🔌 [notification-service] Connecting to RabbitMQ at: ${host}`);
     const connection = await amqp.connect(RABBITMQ_URL);
     const channel = await connection.createChannel();
 
