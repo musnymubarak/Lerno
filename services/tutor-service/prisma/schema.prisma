@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TimeSlotStatus {
+  AVAILABLE
+  BOOKED
+  CANCELLED
+}
+
+model Subject {
+  id         String   @id @default(uuid()) @db.Uuid
+  name       String   @unique
+  category   String?
+  gradeLevel String?
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  tutorSubjects TutorSubject[]
+}
+
+model TutorSubject {
+  tutorId    String   @db.Uuid
+  subjectId  String   @db.Uuid
+  customRate Float?
+  createdAt  DateTime @default(now())
+
+  subject    Subject  @relation(fields: [subjectId], references: [id])
+
+  @@id([tutorId, subjectId])
+}
+
+model TimeSlot {
+  id        String         @id @default(uuid()) @db.Uuid
+  tutorId   String         @db.Uuid
+  startTime DateTime
+  endTime   DateTime
+  status    TimeSlotStatus @default(AVAILABLE)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+}

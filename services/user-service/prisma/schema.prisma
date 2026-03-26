@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  TUTOR
+  ADMIN
+}
+
+enum OutboxStatus {
+  PENDING
+  PUBLISHED
+  FAILED
+}
+
+model User {
+  id           String   @id @db.Uuid
+  email        String   @unique
+  role         Role     @default(USER)
+  firstName    String?
+  lastName     String?
+  phone        String?
+  fcmToken     String?
+  photoUrl     String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tutorProfile   TutorProfile?
+  studentProfile StudentProfile?
+}
+
+model TutorProfile {
+  userId          String   @id @db.Uuid
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bio             String?
+  yearsExperience Int      @default(0)
+  hourlyRate      Float?
+  avgRating       Float    @default(0)
+  totalReviews    Int      @default(0)
+  totalSessions   Int      @default(0)
+  isApproved      Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model StudentProfile {
+  userId     String   @id @db.Uuid
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gradeLevel String?
+  school     String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Outbox {
+  id          String       @id @default(uuid()) @db.Uuid
+  eventType   String
+  payload     Json
+  status      OutboxStatus @default(PENDING)
+  retryCount  Int          @default(0)
+  publishedAt DateTime?
+  createdAt   DateTime     @default(now())
+}
